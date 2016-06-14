@@ -270,25 +270,27 @@ hashkeys.
 
 ```js
 BlogPost.create({
-  email: 'werner@example.com', 
-  title: 'Expanding the Cloud', 
+  email: 'werner@example.com',
+  title: 'Expanding the Cloud',
   content: 'Today, we are excited to announce the limited preview...'
   }, function (err, post) {
     console.log('created blog post', post.get('title'));
   });
 ```
 
-Pass an array of items and they will be saved in parallel to DynamoDB.
+Pass an array of items and they will be saved in a batch write to DynamoDB.
 
 ```js
 var item1 = {email: 'foo1@example.com', name: 'Foo 1', age: 10};
 var item2 = {email: 'foo2@example.com', name: 'Foo 2', age: 20};
 var item3 = {email: 'foo3@example.com', name: 'Foo 3', age: 30};
 
-Account.create([item1, item2, item3], function (err, acccounts) {
+Account.create([item1, item2, item3], function (err, accounts) {
   console.log('created 3 accounts in DynamoDB', accounts);
 });
 ```
+
+Use the `parallel: true` option to write each item in parallel instead.
 
 Use expressions api to do conditional writes
 
@@ -659,7 +661,7 @@ var GameScore = vogels.define('GameScore', {
 });
 ```
 
-Now we can query against the global index 
+Now we can query against the global index
 
 ```js
 GameScore
@@ -671,7 +673,7 @@ GameScore
 
 When can also configure the attributes projected into the index.
 By default all attributes will be projected when no Projection pramater is
-present 
+present
 
 ```js
 var GameScore = vogels.define('GameScore', {
@@ -770,7 +772,7 @@ This api is very similar to the query api.
 Account.scan().exec(callback);
 
 // scan all accounts, this time loading all results
-// note this will potentially make several calls to DynamoDB 
+// note this will potentially make several calls to DynamoDB
 // in order to load all results
 Account
   .scan()
@@ -968,6 +970,25 @@ Account.getItems(['foo@example.com','bar@example.com'], {ConsistentRead: true}, 
 });
 ```
 
+### Batch Write Items
+`Model.putItems` allows you to create multiple items with a single request to DynamoDB.
+
+DynamoDB limits the number of items you can write to 25 or 16 MB of data for a single request.
+Vogels automatically handles splitting up into multiple requests to write all items.
+
+Use `Model.create()` to validate items before batch writing.
+
+```js
+var item1 = {email: 'foo1@example.com', name: 'Foo 1', age: 10};
+var item2 = {email: 'foo2@example.com', name: 'Foo 2', age: 20};
+var item3 = {email: 'foo3@example.com', name: 'Foo 3', age: 30};
+
+Account.putItems([item1, item2, item3], function (err, accounts) {
+  console.log('created 3 accounts in DynamoDB', accounts);
+});
+```
+
+
 ### Streaming api
 vogels supports a basic streaming api in addition to the callback
 api for `query`, `scan`, and `parallelScan` operations.
@@ -1018,7 +1039,7 @@ Logging can be enabled to provide detailed information on data being sent and re
 By default logging is turned off.
 
 ```js
-vogels.log.level('info'); // enabled INFO log level 
+vogels.log.level('info'); // enabled INFO log level
 ```
 
 Logging can also be enabled / disabled at the model level.
