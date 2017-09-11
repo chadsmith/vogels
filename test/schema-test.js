@@ -258,7 +258,7 @@ describe('schema', function () {
           date : Joi.date().default(Date.now),
           count: Joi.number(),
           flag: Joi.boolean(),
-          nums : Joi.array().includes(Joi.number()).meta({dynamoType : 'NS'}),
+          nums : Joi.array().items(Joi.number()).meta({dynamoType : 'NS'}),
           items : Joi.array(),
           data : Joi.object().keys({
             stuff : Joi.array().meta({dynamoType : 'SS'}),

@@ -124,7 +124,7 @@ describe('Vogels Integration Tests', function() {
           lastName  : Joi.string(),
           titles    : Joi.array()
         }),
-        actors : Joi.array().includes(Joi.object().keys({
+        actors : Joi.array().items(Joi.object().keys({
           firstName : Joi.string(),
           lastName  : Joi.string(),
           titles    : Joi.array()
